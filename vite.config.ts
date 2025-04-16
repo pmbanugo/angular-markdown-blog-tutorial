@@ -1,7 +1,7 @@
 /// <reference types="vitest" />
 
 import { defineConfig } from 'vite';
-import analog from '@analogjs/platform';
+import analog, { type PrerenderContentFile } from '@analogjs/platform';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => ({
@@ -17,7 +17,20 @@ export default defineConfig(({ mode }) => ({
         highlighter: 'shiki',
       },
       prerender: {
-        routes: ['/blog', '/blog/2022-12-27-my-first-post'],
+        routes: [
+          '/blog',
+          {
+            contentDir: 'src/content/blog',
+            transform: (file: PrerenderContentFile) => {
+              // use the slug from frontmatter if defined, otherwise use the files basename
+              const slug = file.attributes['slug'] || file.name;
+              return `/blog/${slug}`;
+            },
+          },
+        ],
+        sitemap: {
+          host: 'https://pmbanugo.me',
+        },
       },
     }),
   ],
